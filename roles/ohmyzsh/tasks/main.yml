@@ -1,0 +1,21 @@
+---
+- name: Install OhMyZsh dependencies
+  ansible.builtin.apt:
+    name:
+      - zsh
+  become: true
+
+- name: Get latest Oh my Zsh install script
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
+    dest: "{{ ohmyzsh_install_script }}"
+    mode: "0755"
+  become: true
+
+- name: Execute ohmyzsh install script
+  ansible.builtin.command:  
+    argv:
+      - sh
+      - "{{ ohmyzsh_install_script }}"
+      - --unattended
+  become: true

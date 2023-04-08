@@ -1,0 +1,12 @@
+---
+- name: Add Git PPA
+  ansible.builtin.apt_repository:
+    repo: "{{ git_apt_repo }}"
+  become: true
+
+- name: Install latest git version
+  ansible.builtin.apt:
+    name:
+      - git
+    state: latest
+  become: true

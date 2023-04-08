@@ -1,0 +1,6 @@
+---
+- name: Install recommended build dependencies for Python
+  ansible.builtin.apt:
+    name: "{{ debian_build_dependencies }}"
+    state: latest
+  become: true

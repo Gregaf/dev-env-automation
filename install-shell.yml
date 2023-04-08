@@ -1,0 +1,6 @@
+---
+- name: Configure shell
+  hosts: localhost
+  roles:
+    - git
+    - ohmyzsh
