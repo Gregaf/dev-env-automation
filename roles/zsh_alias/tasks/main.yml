@@ -1,0 +1,23 @@
+---
+- name: Check if alias file exists
+  ansible.builtin.stat:
+    path: "{{ lookup('env', 'HOME') }}/.zsh_aliases"
+  register: alias_file_state
+
+- name: Retrieve and create alias file
+  when: not alias_file_state.stat.exists | bool
+  block:
+    - name: Retrieve Github gist with alias file content
+      ansible.builtin.uri:
+        url: "{{ github_gist_api }}/{{ github_gist_id }}"
+        method: GET
+        body_format: json
+        headers:
+          X-GitHub-Api-Version: "{{ github_gist_api_version }}"
+        status_code: 200
+      register: alias_gist_res
+  
+    - name: Create file with gist content
+      ansible.builtin.copy:
+        dest: "{{ lookup('env', 'HOME') }}/.zsh_aliases"
+        content: "{{ alias_gist_res.json.files['.zsh_aliases']['content'] }}"

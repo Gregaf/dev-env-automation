@@ -1,1 +1,6 @@
 ---
+- name: Setup aliases
+  ansible.builtin.import_playbook: install-zsh-alias.yml
+   
+- name: Setup shell
+  ansible.builtin.import_playbook: install-shell.yml

@@ -1,21 +1,34 @@
 ---
+- name: Check if "oh my zsh" is installed
+  ansible.builtin.stat:
+    path: "{{ lookup('env', 'HOME') }}/.oh-my-zsh"
+  register: oh_myzsh_state
+
 - name: Install OhMyZsh dependencies
   ansible.builtin.apt:
     name:
       - zsh
   become: true
 
-- name: Get latest Oh my Zsh install script
-  ansible.builtin.get_url:
-    url: https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
-    dest: "{{ ohmyzsh_install_script }}"
-    mode: "0755"
-  become: true
+- name: Setup and install Oh my Zsh
+  when: not oh_myzsh_state.stat.exists | bool
+  block:
+    - name: Get latest Oh my Zsh install script
+      ansible.builtin.get_url:
+        url: https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
+        dest: "{{ ohmyzsh_install_script }}"
+        mode: "0755"
+      become: true
 
-- name: Execute ohmyzsh install script
-  ansible.builtin.command:  
-    argv:
-      - sh
-      - "{{ ohmyzsh_install_script }}"
-      - --unattended
-  become: true
+    - name: Execute ohmyzsh install script
+      ansible.builtin.command:  
+        argv:
+          - sh
+          - "{{ ohmyzsh_install_script }}"
+          - --unattended
+      become: true
+    
+    - name: Cleanup install script
+      ansible.builtin.file:
+        path: "{{ ohmyzsh_install_script }}"
+        state: absent

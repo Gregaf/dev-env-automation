@@ -1,22 +1,36 @@
 ---
-- name: Get Pyenv install script
-  ansible.builtin.get_url:
-    url: https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer
-    dest: "{{ pyenv_install_script }}"
-    mode: "0755"
-  become: true
+- name: Check if Pyenv is installed
+  ansible.builtin.stat:
+    path: "{{ lookup('env', 'HOME') }}/.pyenv"
+  register: pyenv_state
 
-- name: Execute Pyenv install script
-  ansible.builtin.command:
-    argv:
-      - ./{{ pyenv_install_script }}
+- name: Retrieve and install Pyenv
+  when: not pyenv_state.stat.exists | bool 
+  block:
+    - name: Get Pyenv install script
+      ansible.builtin.get_url:
+        url: https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer
+        dest: "{{ pyenv_install_script }}"
+        mode: "0755"
+      become: true
+
+    - name: Execute Pyenv install script
+      ansible.builtin.command:
+        argv:
+          - ./{{ pyenv_install_script }}
+      become: true      
+
+    - name: Remove Pyenv install script
+      ansible.builtin.file:
+        path: "{{ pyenv_install_script }}"
+        state: absent
 
 - name: Attach defaults to .zshrc
   ansible.builtin.blockinfile:
     path: .zshrc
     block: |
       export PYENV_ROOT="$HOME/.pyenv"
-      command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
+      command -v pyenv > /dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
       eval "$(pyenv init -)"
 
     

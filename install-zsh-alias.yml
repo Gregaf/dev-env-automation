@@ -1,0 +1,5 @@
+---
+- name: Setup zsh alias file
+  hosts: localhost
+  roles:
+    - role: zsh_alias
