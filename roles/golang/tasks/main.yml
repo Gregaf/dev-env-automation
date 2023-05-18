@@ -1,0 +1,21 @@
+---
+
+- name: Check if Go is installed
+  ansible.builtin.stat:
+    path: "/usr/local/go"
+  register: go_install_state
+
+- name: Unarchive a file that needs to be downloaded (added in 2.0)
+  ansible.builtin.unarchive:
+    src: "{{ go_tar_url }}"
+    dest: /usr/local
+    remote_src: true
+    mode: "0755"
+  when: not go_install_state.stat.exists | bool
+
+- name: Add go dir to path in zshrc
+  ansible.builtin.blockinfile:
+    path: "{{ lookup('env', 'HOME') }}/.zshrc"
+    marker: "# {mark} GOLANG ANSIBLE MANAGED"
+    block: |
+      export "PATH=/usr/local/go/bin:$PATH"

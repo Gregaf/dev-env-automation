@@ -21,3 +21,12 @@
       ansible.builtin.copy:
         dest: "{{ lookup('env', 'HOME') }}/.zsh_aliases"
         content: "{{ alias_gist_res.json.files['.zsh_aliases']['content'] }}"
+
+- name: Add nvm to path in zshrc
+  ansible.builtin.blockinfile:
+    path: "{{ lookup('env', 'HOME') }}/.zshrc"
+    marker: "# {mark} ALIAS ANSIBLE MANAGED"
+    block: |
+      if [ -e $HOME/.zsh_aliases ]; then
+        source $HOME/.zsh_aliases
+      fi

@@ -1,0 +1,2 @@
+---
+go_tar_url: https://go.dev/dl/go{{ go_version }}.linux-amd64.tar.gz

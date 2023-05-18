@@ -1,0 +1,6 @@
+---
+- name: Install SDKs
+  hosts: localhost
+  roles:
+    - nvm
+    - golang
