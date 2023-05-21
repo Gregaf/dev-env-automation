@@ -5,3 +5,4 @@
     - nvm
     # - golang
     - tfenv
+    - aws_cli

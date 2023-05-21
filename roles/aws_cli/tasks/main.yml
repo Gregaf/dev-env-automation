@@ -1,0 +1,26 @@
+---
+- name: Check if AWS CLI is installed
+  ansible.builtin.stat:
+    path: /usr/local/aws-cli
+  register: aws_cli_state
+
+- name: Download and install AWS CLI
+  when: not aws_cli_state.stat.exists | bool
+  block:
+    - name: Download and unarchive AWS CLI installer
+      ansible.builtin.unarchive:
+        src: "{{ aws_cli_url }}"
+        dest: /tmp/
+        remote_src: true
+        mode: "0755"
+      
+    - name: Execute AWS CLI install script
+      ansible.builtin.command: ./install
+      args:
+        chdir: /tmp/aws
+      become: true
+    
+    - name: Cleanup AWS CLI install dependencies
+      ansible.builtin.file:
+        path: /tmp/aws
+        state: absent
