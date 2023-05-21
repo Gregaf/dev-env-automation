@@ -1,0 +1,19 @@
+---
+- name: Check if tfenv is installed
+  ansible.builtin.stat:
+    path: "{{ lookup('env', 'HOME') }}/.tfenv"
+  register: tfenv_state
+
+- name: Clone down tfenv
+  ansible.builtin.git:
+    repo: "{{ tfenv_git_url }}"
+    dest: "{{ lookup('env', 'HOME') }}/.tfenv"
+    depth: 1
+  when: not tfenv_state.stat.exists | bool
+    
+- name: Add tfenv bin dir to path in zshrc
+  ansible.builtin.blockinfile:
+    path: "{{ lookup('env', 'HOME') }}/.zshrc"
+    marker: "# {mark} TFENV ANSIBLE MANAGED"
+    block: |
+      export PATH="$HOME/.tfenv/bin:$PATH"
